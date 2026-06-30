@@ -33,7 +33,7 @@ FEATURE_FIELDS = [
 @login_required
 def property_add(request):
     if request.method == 'POST':
-        form = PropertyForm(request.POST)
+        form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
             prop = form.save(commit=False)
             prop.owner = request.user
@@ -50,7 +50,7 @@ def property_add(request):
 def property_edit(request, pk):
     prop = get_object_or_404(Property, pk=pk, owner=request.user)
     if request.method == 'POST':
-        form = PropertyForm(request.POST, instance=prop)
+        form = PropertyForm(request.POST, request.FILES, instance=prop)
         if form.is_valid():
             form.save()
             messages.success(request, 'Property updated successfully.')

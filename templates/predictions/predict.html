@@ -24,12 +24,13 @@
           <select id="property_id" class="field-input field-select">
             <option value="">— Manual entry —</option>
             {% for prop in properties %}
-            <option value="{{ prop.pk }}"
+            <option value="{{ prop.pk }}" {% if selected_property and prop.pk == selected_property.pk %}selected{% endif %}
               data-area="{{ prop.area }}" data-bedrooms="{{ prop.bedrooms }}"
               data-bathrooms="{{ prop.bathrooms }}" data-stories="{{ prop.stories }}"
               data-parking="{{ prop.parking }}" data-furnishing="{{ prop.furnishingstatus }}"
               data-mainroad="{{ prop.mainroad }}" data-ac="{{ prop.airconditioning }}"
-              data-prefarea="{{ prop.prefarea }}">
+              data-prefarea="{{ prop.prefarea }}" data-guestroom="{{ prop.guestroom }}"
+              data-basement="{{ prop.basement }}" data-hotwaterheating="{{ prop.hotwaterheating }}">
               {{ prop.title }}
             </option>
             {% endfor %}
@@ -93,7 +94,7 @@
           <label class="switch"><input type="checkbox" id="f_prefarea"><span class="switch-slider"></span></label>
         </div>
 
-        <button id="predict-btn" onclick="runPrediction()" class="btn-primary btn-lg w-100 mt-4" style="justify-content:center;">
+        <button type="button" id="predict-btn" onclick="runPrediction()" class="btn-primary btn-lg w-100 mt-4" style="justify-content:center;">
           <i class="bi bi-graph-up-arrow"></i> Predict Price
         </button>
       </div>
@@ -134,13 +135,28 @@
 <script>
 const CSRF = '{{ csrf_token }}';
 function getToggle(id) { return document.getElementById(id).checked ? 'yes' : 'no'; }
+function setDisplay(el, value) { if (el) el.style.display = value; }
+function showPredictionError(message) {
+  const err = document.getElementById('result-error');
+  if (err) {
+    err.textContent = message;
+    err.style.display = 'flex';
+  } else {
+    alert(message);
+  }
+}
 
 async function runPrediction() {
   const btn = document.getElementById('predict-btn');
+  const resultOutput = document.getElementById('result-output');
+  const resultError = document.getElementById('result-error');
+  const resultPlaceholder = document.getElementById('result-placeholder');
+  const resultPrice = document.getElementById('result-price-value');
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:14px;height:14px;border-width:2px;"></span> Predicting…';
-  document.getElementById('result-output').style.display = 'none';
-  document.getElementById('result-error').style.display = 'none';
+  setDisplay(resultOutput, 'none');
+  setDisplay(resultError, 'none');
 
   const payload = {
     area: document.getElementById('f_area').value,
@@ -167,19 +183,17 @@ async function runPrediction() {
     });
     const json = await res.json();
     if (json.predicted_price !== undefined) {
-      document.getElementById('result-price-value').textContent =
-        '₦' + parseFloat(json.predicted_price).toLocaleString('en-NG', { minimumFractionDigits: 0 });
-      document.getElementById('result-placeholder').style.display = 'none';
-      document.getElementById('result-output').style.display = 'block';
+      if (resultPrice) {
+        resultPrice.textContent =
+          '₦' + parseFloat(json.predicted_price).toLocaleString('en-NG', { minimumFractionDigits: 0 });
+      }
+      setDisplay(resultPlaceholder, 'none');
+      setDisplay(resultOutput, 'block');
     } else {
-      const err = document.getElementById('result-error');
-      err.textContent = json.error || 'Prediction failed. Check all fields and try again.';
-      err.style.display = 'flex';
+      showPredictionError(json.error || 'Prediction failed. Check all fields and try again.');
     }
   } catch(e) {
-    const err = document.getElementById('result-error');
-    err.textContent = 'Network error. Please try again.';
-    err.style.display = 'flex';
+    showPredictionError('Network error. Please try again.');
   }
   btn.disabled = false;
   btn.innerHTML = '<i class="bi bi-graph-up-arrow"></i> Predict Price';
@@ -200,7 +214,13 @@ if (propSel) {
     document.getElementById('f_airconditioning').checked = opt.dataset.ac === 'yes';
     document.getElementById('f_mainroad').checked = opt.dataset.mainroad === 'yes';
     document.getElementById('f_prefarea').checked = opt.dataset.prefarea === 'yes';
+    document.getElementById('f_guestroom').checked = opt.dataset.guestroom === 'yes';
+    document.getElementById('f_basement').checked = opt.dataset.basement === 'yes';
+    document.getElementById('f_hotwaterheating').checked = opt.dataset.hotwaterheating === 'yes';
   });
+  if (propSel.value) {
+    propSel.dispatchEvent(new Event('change'));
+  }
 }
 </script>
 {% endblock %}

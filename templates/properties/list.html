@@ -26,7 +26,11 @@
     <div class="col-sm-6 col-xl-4">
       <div class="property-card">
         <div class="prop-img-wrap">
+          {% if prop.photo %}
+          <img src="{{ prop.photo.url }}" alt="{{ prop.title }}" class="prop-img">
+          {% else %}
           <img src="https://placehold.co/400x208/1a2332/faf6f0?text=Property+Photo" alt="{{ prop.title }}" class="prop-img">
+          {% endif %}
           <span class="prop-status">Listed</span>
           <span class="prop-type">{{ prop.furnishingstatus|capfirst }}</span>
         </div>

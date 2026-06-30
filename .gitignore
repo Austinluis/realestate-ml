@@ -6,3 +6,4 @@ ml/dataset/
 venv/
 db.sqlite3
 *.log
+media/

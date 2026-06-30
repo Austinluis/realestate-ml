@@ -11,6 +11,30 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ml'))
 
+INTEGER_FIELDS = ['area', 'bedrooms', 'bathrooms', 'stories', 'parking']
+CHOICE_DEFAULTS = {
+    'mainroad': 'no',
+    'guestroom': 'no',
+    'basement': 'no',
+    'hotwaterheating': 'no',
+    'airconditioning': 'no',
+    'prefarea': 'no',
+    'furnishingstatus': 'unfurnished',
+}
+
+def parse_prediction_features(data):
+    features = {}
+    for field in INTEGER_FIELDS:
+        value = data.get(field)
+        if value in (None, ''):
+            raise ValueError(f'{field} is required.')
+        features[field] = int(value)
+
+    for field, default in CHOICE_DEFAULTS.items():
+        features[field] = data.get(field) or default
+
+    return features
+
 @login_required
 def predict_view(request):
     properties = Property.objects.filter(owner=request.user)
@@ -20,20 +44,10 @@ def predict_view(request):
         except (json.JSONDecodeError, Exception):
             data = request.POST.dict()
 
-        features = {
-            'area': int(data.get('area', 0)),
-            'bedrooms': int(data.get('bedrooms', 0)),
-            'bathrooms': int(data.get('bathrooms', 0)),
-            'stories': int(data.get('stories', 0)),
-            'mainroad': data.get('mainroad', 'no'),
-            'guestroom': data.get('guestroom', 'no'),
-            'basement': data.get('basement', 'no'),
-            'hotwaterheating': data.get('hotwaterheating', 'no'),
-            'airconditioning': data.get('airconditioning', 'no'),
-            'parking': int(data.get('parking', 0)),
-            'prefarea': data.get('prefarea', 'no'),
-            'furnishingstatus': data.get('furnishingstatus', 'unfurnished'),
-        }
+        try:
+            features = parse_prediction_features(data)
+        except ValueError as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
         try:
             from predict import predict_price
@@ -59,7 +73,18 @@ def predict_view(request):
 
         return JsonResponse({'predicted_price': predicted, 'prediction_id': prediction.id})
 
-    return render(request, 'predictions/predict.html', {'properties': properties})
+    selected_property = None
+    prop_id = request.GET.get('property_id')
+    if prop_id:
+        try:
+            selected_property = properties.get(pk=prop_id)
+        except Property.DoesNotExist:
+            selected_property = None
+
+    return render(request, 'predictions/predict.html', {
+        'properties': properties,
+        'selected_property': selected_property,
+    })
 
 @login_required
 def prediction_history(request):

@@ -14,7 +14,7 @@
 <div class="section-wrap">
   <div class="row justify-content-center">
     <div class="col-lg-9">
-      <form method="post" novalidate>
+      <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
         <!-- Basic Info -->
@@ -39,6 +39,11 @@
               <label class="field-label">Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
               <textarea name="description" class="field-input field-textarea" rows="3"
                 placeholder="Describe the property — features, neighbourhood, access…">{{ form.description.value|default:'' }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="field-label">Property Photo <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+              <input type="file" name="photo" class="field-input" accept="image/jpeg,image/png,image/webp">
+              {% for e in form.photo.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
           </div>
         </div>

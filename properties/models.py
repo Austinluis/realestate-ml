@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from accounts.models import User
 
 FURNISHING_CHOICES = [
@@ -13,6 +14,12 @@ class Property(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    photo = models.FileField(
+        upload_to='property_photos/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp'])],
+    )
     location = models.CharField(max_length=255)
     area = models.IntegerField(help_text='Area in square feet')
     bedrooms = models.IntegerField()
