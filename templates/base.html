@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}EstateIQ{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<header class="eq-navbar">
+  <div class="eq-navbar-inner">
+    <a href="{% url 'dashboard' %}" class="eq-brand">
+      <div class="eq-brand-icon"><i class="bi bi-house-fill"></i></div>
+      <div>
+        <span class="eq-brand-name">EstateIQ</span>
+        <span class="eq-brand-tag">Predict · Invest · Prosper</span>
+      </div>
+    </a>
+
+    <nav>
+      <ul class="eq-nav-links">
+        <li><a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %}><i class="bi bi-layout-dashboard"></i> Dashboard</a></li>
+        <li><a href="{% url 'property_list' %}" {% if 'property_list' in request.resolver_match.url_name %}class="active"{% endif %}><i class="bi bi-building"></i> Properties</a></li>
+        <li><a href="{% url 'property_add' %}" {% if request.resolver_match.url_name == 'property_add' %}class="active"{% endif %}><i class="bi bi-plus-circle"></i> Add Property</a></li>
+        <li><a href="{% url 'predict' %}" {% if request.resolver_match.url_name == 'predict' %}class="active"{% endif %}><i class="bi bi-graph-up-arrow"></i> Predict</a></li>
+        <li><a href="{% url 'prediction_history' %}" {% if request.resolver_match.url_name == 'prediction_history' %}class="active"{% endif %}><i class="bi bi-clock-history"></i> History</a></li>
+      </ul>
+    </nav>
+
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="{% url 'dashboard' %}"><i class="bi bi-layout-dashboard"></i> Dashboard</a>
+  <a href="{% url 'property_list' %}"><i class="bi bi-building"></i> Properties</a>
+  <a href="{% url 'property_add' %}"><i class="bi bi-plus-circle"></i> Add Property</a>
+  <a href="{% url 'predict' %}"><i class="bi bi-graph-up-arrow"></i> Predict Price</a>
+  <a href="{% url 'prediction_history' %}"><i class="bi bi-clock-history"></i> History</a>
+  <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</div>
+{% endif %}
+
+{% for message in messages %}
+<div class="eq-alert eq-alert-{{ message.tags }}">
+  <span>{{ message }}</span>
+  <button class="eq-alert-close" onclick="this.parentElement.remove()">&times;</button>
+</div>
+{% endfor %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="eq-footer">
+  <div class="eq-footer-name">EstateIQ</div>
+  <div class="eq-footer-tag">Predict · Invest · Prosper</div>
+  <div class="eq-footer-copy">GROUP 15 | CSC 476 | University of Ibadan | 400L<br><span>ML-Driven Real Estate Management System</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% load static %}
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

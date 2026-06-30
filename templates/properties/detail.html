@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ property.title }} — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Property Detail</div>
+    <div class="page-gold-line"></div>
+    <h1>{{ property.title }}</h1>
+    <p class="subtitle"><i class="bi bi-geo-alt"></i> {{ property.location }}</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <!-- Image -->
+      <div style="border-radius:var(--radius);overflow:hidden;height:280px;margin-bottom:1.25rem;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+        <img src="https://placehold.co/800x280/1a2332/faf6f0?text=Property+Photo" alt="{{ property.title }}" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+
+      <!-- Specs Card -->
+      <div class="form-section">
+        <div class="form-section-title">Property Details</div>
+        {% if property.description %}<p style="font-size:14px;color:rgba(26,35,50,0.65);margin-bottom:1rem;">{{ property.description }}</p>{% endif %}
+        <div class="row g-3" style="font-size:13.5px;color:var(--navy);">
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Area</span>{{ property.area }} sqft</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Bedrooms</span>{{ property.bedrooms }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Bathrooms</span>{{ property.bathrooms }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Stories</span>{{ property.stories }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Parking</span>{{ property.parking }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Furnishing</span>{{ property.furnishingstatus|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Air Con</span>{{ property.airconditioning|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Pref Area</span>{{ property.prefarea|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Guest Room</span>{{ property.guestroom|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Basement</span>{{ property.basement|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Main Road</span>{{ property.mainroad|capfirst }}</div>
+          <div class="col-6 col-md-3"><span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;display:block;margin-bottom:4px;">Hot Water</span>{{ property.hotwaterheating|capfirst }}</div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'property_edit' property.pk %}" class="btn-outline"><i class="bi bi-pencil"></i> Edit Property</a>
+        <form method="post" action="{% url 'property_delete' property.pk %}" onsubmit="return confirm('Delete this property?')">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger"><i class="bi bi-trash"></i> Delete</button>
+        </form>
+        <a href="{% url 'property_list' %}" class="btn-outline"><i class="bi bi-arrow-left"></i> Back</a>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="eq-card">
+        <div class="eq-card-header"><span class="eq-card-title">Valuation</span></div>
+        <div style="padding:1.25rem;">
+          {% if property.listed_price %}
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(26,35,50,0.45);font-weight:600;margin-bottom:6px;">Listed Price</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--terracotta);">₦{{ property.listed_price|floatformat:0 }}</div>
+          </div>
+          {% endif %}
+          <a href="{% url 'predict' %}?property_id={{ property.pk }}" class="btn-primary btn-lg w-100" style="justify-content:center;">
+            <i class="bi bi-graph-up-arrow"></i> Get ML Valuation
+          </a>
+          <p style="font-size:11px;color:rgba(26,35,50,0.40);text-align:center;margin-top:10px;">Powered by Random Forest ML</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

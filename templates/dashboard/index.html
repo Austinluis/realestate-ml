@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Portfolio Overview</div>
+    <div class="page-gold-line"></div>
+    <h1>Welcome to <em>EstateIQ</em></h1>
+    <p class="subtitle">Your real estate portfolio at a glance — track value, predictions, and recent activity.</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+
+  <!-- Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-building"></i></div>
+        <div class="stat-value">{{ property_count }}</div>
+        <div class="stat-label">Properties</div>
+        <div class="stat-change neutral">In your portfolio</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="stat-value">{{ prediction_count }}</div>
+        <div class="stat-label">Predictions</div>
+        <div class="stat-change neutral">Valuations run</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+        <div class="stat-value">—</div>
+        <div class="stat-label">Portfolio Value</div>
+        <div class="stat-change">+12.5% est.</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-lightning-charge"></i></div>
+        <div class="stat-value">81.3%</div>
+        <div class="stat-label">Best R² Score</div>
+        <div class="stat-change neutral">Random Forest</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <a href="{% url 'property_add' %}" class="quick-link">
+        <div class="quick-link-icon"><i class="bi bi-plus-circle"></i></div>
+        <div>
+          <div class="quick-link-title">Add Property</div>
+          <div class="quick-link-sub">List a new property</div>
+        </div>
+        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+      </a>
+    </div>
+    <div class="col-sm-4">
+      <a href="{% url 'predict' %}" class="quick-link">
+        <div class="quick-link-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div>
+          <div class="quick-link-title">Predict Price</div>
+          <div class="quick-link-sub">Run an ML valuation</div>
+        </div>
+        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+      </a>
+    </div>
+    <div class="col-sm-4">
+      <a href="{% url 'prediction_history' %}" class="quick-link">
+        <div class="quick-link-icon"><i class="bi bi-clock-history"></i></div>
+        <div>
+          <div class="quick-link-title">View History</div>
+          <div class="quick-link-sub">All past predictions</div>
+        </div>
+        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Lists -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="eq-card">
+        <div class="eq-card-header">
+          <span class="eq-card-title">Recent Properties</span>
+          <a href="{% url 'property_list' %}" class="btn-outline" style="font-size:11px;padding:4px 12px;">View all <i class="bi bi-arrow-up-right"></i></a>
+        </div>
+        {% for prop in recent_properties %}
+        <a href="{% url 'property_detail' prop.pk %}" class="eq-list-item" style="display:flex;">
+          <div>
+            <div class="eq-list-title">{{ prop.title }}</div>
+            <div class="eq-list-sub"><i class="bi bi-geo-alt"></i> {{ prop.location }}</div>
+          </div>
+          {% if prop.listed_price %}<span class="eq-badge">₦{{ prop.listed_price|floatformat:0 }}</span>{% endif %}
+        </a>
+        {% empty %}
+        <div style="padding:2rem;text-align:center;font-size:13px;color:rgba(26,35,50,0.40);">
+          No properties yet. <a href="{% url 'property_add' %}" style="color:var(--terracotta);">Add one</a>.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="eq-card">
+        <div class="eq-card-header">
+          <span class="eq-card-title">Recent Predictions</span>
+          <a href="{% url 'prediction_history' %}" class="btn-outline" style="font-size:11px;padding:4px 12px;">View all <i class="bi bi-arrow-up-right"></i></a>
+        </div>
+        {% for pred in recent_predictions %}
+        <div class="eq-list-item">
+          <div>
+            <div class="eq-list-title">{{ pred.bedrooms }} bed · {{ pred.bathrooms }} bath · {{ pred.area }} sqft</div>
+            <div class="eq-list-sub">{{ pred.furnishingstatus|capfirst }}{% if pred.airconditioning == 'yes' %} · A/C{% endif %}</div>
+          </div>
+          <span class="eq-badge">₦{{ pred.predicted_price|floatformat:0 }}</span>
+        </div>
+        {% empty %}
+        <div style="padding:2rem;text-align:center;font-size:13px;color:rgba(26,35,50,0.40);">
+          No predictions yet. <a href="{% url 'predict' %}" style="color:var(--terracotta);">Run one</a>.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

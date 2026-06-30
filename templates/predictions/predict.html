@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}Predict Price — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">ML Valuation Engine</div>
+    <div class="page-gold-line"></div>
+    <h1>Predict the <em>Price</em></h1>
+    <p class="subtitle">Enter property features and get an instant ML-powered price prediction.</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+  <div class="row g-4">
+
+    <!-- Left: Form -->
+    <div class="col-lg-7">
+      <div class="form-section">
+        <div class="form-section-title">Property Features</div>
+        {% if properties %}
+        <div class="mb-4">
+          <label class="field-label">Link to existing property <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <select id="property_id" class="field-input field-select">
+            <option value="">— Manual entry —</option>
+            {% for prop in properties %}
+            <option value="{{ prop.pk }}"
+              data-area="{{ prop.area }}" data-bedrooms="{{ prop.bedrooms }}"
+              data-bathrooms="{{ prop.bathrooms }}" data-stories="{{ prop.stories }}"
+              data-parking="{{ prop.parking }}" data-furnishing="{{ prop.furnishingstatus }}"
+              data-mainroad="{{ prop.mainroad }}" data-ac="{{ prop.airconditioning }}"
+              data-prefarea="{{ prop.prefarea }}">
+              {{ prop.title }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <label class="field-label">Area (sqft)</label>
+            <input type="number" id="f_area" class="field-input" placeholder="2500" min="1">
+          </div>
+          <div class="col-sm-6">
+            <label class="field-label">Bedrooms</label>
+            <input type="number" id="f_bedrooms" class="field-input" placeholder="3" min="1">
+          </div>
+          <div class="col-sm-6">
+            <label class="field-label">Bathrooms</label>
+            <input type="number" id="f_bathrooms" class="field-input" placeholder="2" min="1">
+          </div>
+          <div class="col-sm-6">
+            <label class="field-label">Stories</label>
+            <input type="number" id="f_stories" class="field-input" placeholder="2" min="1">
+          </div>
+          <div class="col-sm-6">
+            <label class="field-label">Parking Spaces</label>
+            <input type="number" id="f_parking" class="field-input" placeholder="1" min="0">
+          </div>
+          <div class="col-sm-6">
+            <label class="field-label">Furnishing Status</label>
+            <select id="f_furnishing" class="field-input field-select">
+              <option value="furnished">Furnished</option>
+              <option value="semi-furnished">Semi-Furnished</option>
+              <option value="unfurnished" selected>Unfurnished</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Feature toggles -->
+        <div class="switch-row">
+          <span class="switch-label">Air Conditioning</span>
+          <label class="switch"><input type="checkbox" id="f_airconditioning"><span class="switch-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <span class="switch-label">On Main Road</span>
+          <label class="switch"><input type="checkbox" id="f_mainroad"><span class="switch-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <span class="switch-label">Guest Room</span>
+          <label class="switch"><input type="checkbox" id="f_guestroom"><span class="switch-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <span class="switch-label">Basement</span>
+          <label class="switch"><input type="checkbox" id="f_basement"><span class="switch-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <span class="switch-label">Hot Water Heating</span>
+          <label class="switch"><input type="checkbox" id="f_hotwaterheating"><span class="switch-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <span class="switch-label">Preferred Area</span>
+          <label class="switch"><input type="checkbox" id="f_prefarea"><span class="switch-slider"></span></label>
+        </div>
+
+        <button id="predict-btn" onclick="runPrediction()" class="btn-primary btn-lg w-100 mt-4" style="justify-content:center;">
+          <i class="bi bi-graph-up-arrow"></i> Predict Price
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Result -->
+    <div class="col-lg-5">
+      <div id="result-placeholder" class="result-placeholder">
+        <i class="bi bi-graph-up-arrow"></i>
+        <p>Fill in the property details and click <strong>Predict Price</strong> to get your AI valuation.</p>
+      </div>
+      <div id="result-output" style="display:none;">
+        <div class="result-card mb-3">
+          <div class="result-label">Estimated Property Value</div>
+          <div class="result-price" id="result-price-value">—</div>
+          <div class="result-sub">Powered by Random Forest ML Model</div>
+        </div>
+        <div class="eq-card">
+          <div class="eq-card-header"><span class="eq-card-title">Result Details</span></div>
+          <div class="eq-list-item">
+            <span style="font-size:13px;color:rgba(26,35,50,0.60);">Model used</span>
+            <span class="eq-badge">Random Forest</span>
+          </div>
+          <div class="eq-list-item">
+            <span style="font-size:13px;color:rgba(26,35,50,0.60);">View history</span>
+            <a href="{% url 'prediction_history' %}" class="eq-badge" style="text-decoration:none;cursor:pointer;">See all →</a>
+          </div>
+        </div>
+      </div>
+      <div id="result-error" class="eq-alert eq-alert-error mt-3" style="display:none;border-radius:var(--radius);"></div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const CSRF = '{{ csrf_token }}';
+function getToggle(id) { return document.getElementById(id).checked ? 'yes' : 'no'; }
+
+async function runPrediction() {
+  const btn = document.getElementById('predict-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:14px;height:14px;border-width:2px;"></span> Predicting…';
+  document.getElementById('result-output').style.display = 'none';
+  document.getElementById('result-error').style.display = 'none';
+
+  const payload = {
+    area: document.getElementById('f_area').value,
+    bedrooms: document.getElementById('f_bedrooms').value,
+    bathrooms: document.getElementById('f_bathrooms').value,
+    stories: document.getElementById('f_stories').value,
+    parking: document.getElementById('f_parking').value,
+    furnishingstatus: document.getElementById('f_furnishing').value,
+    airconditioning: getToggle('f_airconditioning'),
+    mainroad: getToggle('f_mainroad'),
+    guestroom: getToggle('f_guestroom'),
+    basement: getToggle('f_basement'),
+    hotwaterheating: getToggle('f_hotwaterheating'),
+    prefarea: getToggle('f_prefarea'),
+  };
+  const sel = document.getElementById('property_id');
+  if (sel && sel.value) payload.property_id = sel.value;
+
+  try {
+    const res = await fetch('/predictions/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.predicted_price !== undefined) {
+      document.getElementById('result-price-value').textContent =
+        '₦' + parseFloat(json.predicted_price).toLocaleString('en-NG', { minimumFractionDigits: 0 });
+      document.getElementById('result-placeholder').style.display = 'none';
+      document.getElementById('result-output').style.display = 'block';
+    } else {
+      const err = document.getElementById('result-error');
+      err.textContent = json.error || 'Prediction failed. Check all fields and try again.';
+      err.style.display = 'flex';
+    }
+  } catch(e) {
+    const err = document.getElementById('result-error');
+    err.textContent = 'Network error. Please try again.';
+    err.style.display = 'flex';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-graph-up-arrow"></i> Predict Price';
+}
+
+// Auto-fill from property
+const propSel = document.getElementById('property_id');
+if (propSel) {
+  propSel.addEventListener('change', function () {
+    const opt = this.options[this.selectedIndex];
+    if (!opt.value) return;
+    document.getElementById('f_area').value = opt.dataset.area || '';
+    document.getElementById('f_bedrooms').value = opt.dataset.bedrooms || '';
+    document.getElementById('f_bathrooms').value = opt.dataset.bathrooms || '';
+    document.getElementById('f_stories').value = opt.dataset.stories || '';
+    document.getElementById('f_parking').value = opt.dataset.parking || '';
+    document.getElementById('f_furnishing').value = opt.dataset.furnishing || 'unfurnished';
+    document.getElementById('f_airconditioning').checked = opt.dataset.ac === 'yes';
+    document.getElementById('f_mainroad').checked = opt.dataset.mainroad === 'yes';
+    document.getElementById('f_prefarea').checked = opt.dataset.prefarea === 'yes';
+  });
+}
+</script>
+{% endblock %}

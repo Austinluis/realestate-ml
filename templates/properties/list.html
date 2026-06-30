@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Properties — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Your Portfolio</div>
+    <div class="page-gold-line"></div>
+    <h1>My <em>Properties</em></h1>
+    <p class="subtitle">Manage and track your real estate listings.</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:600;color:var(--navy);">Listed Properties</h2>
+      <p style="font-size:13px;color:rgba(26,35,50,0.50);margin-top:2px;">{{ properties.count }} propert{{ properties.count|pluralize:"y,ies" }} in your portfolio</p>
+    </div>
+    <a href="{% url 'property_add' %}" class="btn-primary"><i class="bi bi-plus-lg"></i> Add Property</a>
+  </div>
+
+  {% if properties %}
+  <div class="row g-4">
+    {% for prop in properties %}
+    <div class="col-sm-6 col-xl-4">
+      <div class="property-card">
+        <div class="prop-img-wrap">
+          <img src="https://placehold.co/400x208/1a2332/faf6f0?text=Property+Photo" alt="{{ prop.title }}" class="prop-img">
+          <span class="prop-status">Listed</span>
+          <span class="prop-type">{{ prop.furnishingstatus|capfirst }}</span>
+        </div>
+        <div class="prop-body">
+          <div class="prop-title">{{ prop.title }}</div>
+          <div class="prop-location"><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}</div>
+          <div class="prop-specs">
+            <span class="prop-spec"><i class="bi bi-door-open"></i> {{ prop.bedrooms }} Bed</span>
+            <span class="prop-spec"><i class="bi bi-droplet"></i> {{ prop.bathrooms }} Bath</span>
+            <span class="prop-spec"><i class="bi bi-layers"></i> {{ prop.stories }} Fl</span>
+            <span class="prop-spec"><i class="bi bi-aspect-ratio"></i> {{ prop.area }} sqft</span>
+          </div>
+          {% if prop.listed_price %}<div class="prop-price">₦{{ prop.listed_price|floatformat:0 }} <small>listed</small></div>{% endif %}
+          <div class="prop-actions">
+            <a href="{% url 'property_detail' prop.pk %}" class="btn-primary"><i class="bi bi-eye"></i> View</a>
+            <a href="{% url 'property_edit' prop.pk %}" class="btn-outline"><i class="bi bi-pencil"></i> Edit</a>
+            <form method="post" action="{% url 'property_delete' prop.pk %}" onsubmit="return confirm('Delete this property?')" style="margin-left:auto;">
+              {% csrf_token %}
+              <button type="submit" class="btn-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-building"></i>
+    <p>No properties yet. <a href="{% url 'property_add' %}">Add your first one</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

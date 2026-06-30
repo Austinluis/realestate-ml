@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Edit — {{ property.title }} — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Edit Property</div>
+    <div class="page-gold-line"></div>
+    <h1><em>{{ property.title }}</em></h1>
+    <p class="subtitle">Update the details of this property.</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-section">
+          <div class="form-section-title">Basic Information</div>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="field-label">Property Title</label>
+              <input type="text" name="title" class="field-input" value="{{ form.title.value|default:'' }}" required>
+            </div>
+            <div class="col-12">
+              <label class="field-label">Location</label>
+              <input type="text" name="location" class="field-input" value="{{ form.location.value|default:'' }}" required>
+            </div>
+            <div class="col-12">
+              <label class="field-label">Description</label>
+              <textarea name="description" class="field-input field-textarea" rows="3">{{ form.description.value|default:'' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Specifications</div>
+          <div class="row g-3">
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Area (sqft)</label>
+              <input type="number" name="area" class="field-input" value="{{ form.area.value|default:'' }}" min="1" required>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Bedrooms</label>
+              <input type="number" name="bedrooms" class="field-input" value="{{ form.bedrooms.value|default:'' }}" min="1" required>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Bathrooms</label>
+              <input type="number" name="bathrooms" class="field-input" value="{{ form.bathrooms.value|default:'' }}" min="1" required>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Stories</label>
+              <input type="number" name="stories" class="field-input" value="{{ form.stories.value|default:'' }}" min="1" required>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Parking</label>
+              <input type="number" name="parking" class="field-input" value="{{ form.parking.value|default:'' }}" min="0" required>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <label class="field-label">Listed Price (₦)</label>
+              <input type="number" name="listed_price" class="field-input" value="{{ form.listed_price.value|default:'' }}" min="0">
+            </div>
+            <div class="col-sm-6 col-md-6">
+              <label class="field-label">Furnishing Status</label>
+              <select name="furnishingstatus" class="field-input field-select" required>
+                <option value="furnished" {% if form.furnishingstatus.value == 'furnished' %}selected{% endif %}>Furnished</option>
+                <option value="semi-furnished" {% if form.furnishingstatus.value == 'semi-furnished' %}selected{% endif %}>Semi-Furnished</option>
+                <option value="unfurnished" {% if form.furnishingstatus.value == 'unfurnished' %}selected{% endif %}>Unfurnished</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Property Features</div>
+          {% for fname, flabel, fval in form_features_with_values %}
+          <div class="switch-row">
+            <span class="switch-label">{{ flabel }}</span>
+            <label class="switch">
+              <input type="checkbox" id="sw_{{ fname }}" {% if fval == 'yes' %}checked{% endif %}
+                onchange="document.getElementById('hid_{{ fname }}').value = this.checked ? 'yes' : 'no'">
+              <span class="switch-slider"></span>
+            </label>
+            <input type="hidden" name="{{ fname }}" id="hid_{{ fname }}" value="{{ fval }}">
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex gap-3 flex-wrap">
+          <button type="submit" class="btn-primary btn-lg"><i class="bi bi-floppy-fill"></i> Update Property</button>
+          <a href="{% url 'property_detail' property.pk %}" class="btn-outline btn-lg"><i class="bi bi-x-lg"></i> Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

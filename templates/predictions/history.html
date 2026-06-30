@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Prediction History — EstateIQ{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Past Valuations</div>
+    <div class="page-gold-line"></div>
+    <h1>Prediction <em>History</em></h1>
+    <p class="subtitle">A record of every valuation you've run with EstateIQ, including the ML model used.</p>
+  </div>
+</div>
+
+<div class="section-wrap">
+  {% if predictions %}
+  <div class="eq-card" style="overflow-x:auto;">
+    <table class="eq-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Area</th>
+          <th>Beds</th>
+          <th>Baths</th>
+          <th>A/C</th>
+          <th>Furnishing</th>
+          <th>Model Used</th>
+          <th>Predicted Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pred in predictions %}
+        <tr>
+          <td style="font-size:12px;color:rgba(26,35,50,0.40);">#{{ forloop.revcounter|stringformat:"03d" }}</td>
+          <td style="white-space:nowrap;">{{ pred.created_at|date:"d M Y, H:i" }}</td>
+          <td style="white-space:nowrap;">{{ pred.area }} sqft</td>
+          <td>{{ pred.bedrooms }}</td>
+          <td>{{ pred.bathrooms }}</td>
+          <td>
+            {% if pred.airconditioning == 'yes' %}
+            <span style="color:#059669;font-size:12.5px;display:flex;align-items:center;gap:4px;"><i class="bi bi-check-circle-fill"></i> Yes</span>
+            {% else %}
+            <span style="color:rgba(26,35,50,0.35);font-size:12.5px;display:flex;align-items:center;gap:4px;"><i class="bi bi-x-circle"></i> No</span>
+            {% endif %}
+          </td>
+          <td>{{ pred.furnishingstatus|capfirst }}</td>
+          <td>
+            <span style="font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:9999px;
+              {% if pred.model_used == 'best_model' or pred.model_used == 'random_forest' %}background:#d1fae5;color:#065f46;
+              {% else %}background:rgba(193,101,74,0.10);color:var(--terracotta);{% endif %}">
+              {{ pred.model_used|default:"Random Forest"|capfirst }}
+            </span>
+          </td>
+          <td>
+            <span class="eq-badge" style="font-size:13px;">₦{{ pred.predicted_price|floatformat:0 }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-clock-history"></i>
+    <p>No predictions yet. <a href="{% url 'predict' %}">Run your first valuation</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

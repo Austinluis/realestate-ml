@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.py[cod]
+*.pkl
+ml/dataset/
+venv/
+db.sqlite3
+*.log
