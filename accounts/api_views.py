@@ -16,11 +16,15 @@ class RegisterAPIView(APIView):
         for field in required:
             if not data.get(field):
                 return Response({'error': f'{field} is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        if User.objects.filter(email=data['email']).exists():
-            return Response({'error': 'Email already registered.'}, status=status.HTTP_400_BAD_REQUEST)
+        email = data['email'].strip().lower()
+        username = data['username'].strip()
+        if User.objects.filter(email__iexact=email).exists():
+            return Response({'error': 'An account with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username__iexact=username).exists():
+            return Response({'error': 'An account with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create_user(
-            username=data['username'],
-            email=data['email'],
+            username=username,
+            email=email,
             password=data['password'],
             first_name=data.get('first_name', ''),
             last_name=data.get('last_name', ''),
@@ -32,15 +36,20 @@ class LoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        email = request.data.get('email')
+        identifier = request.data.get('identifier') or request.data.get('email')
         password = request.data.get('password')
-        if not email or not password:
-            return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
-        user = authenticate(request, username=email, password=password)
+        if not identifier or not password:
+            return Response({'error': 'Username/email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+        auth_identifier = identifier.strip()
+        if '@' not in auth_identifier:
+            matched_user = User.objects.filter(username__iexact=auth_identifier).first()
+            if matched_user:
+                auth_identifier = matched_user.email
+        user = authenticate(request, username=auth_identifier, password=password)
         if user:
             login(request, user)
             return Response({'message': 'Login successful.', 'user': UserSerializer(user).data})
-        return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'Invalid username/email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutAPIView(APIView):

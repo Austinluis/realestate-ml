@@ -37,8 +37,9 @@
             </div>
             <div class="col-12">
               <label class="field-label">Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-              <textarea name="description" class="field-input field-textarea" rows="3"
+              <textarea name="description" class="field-input field-textarea {% if form.description.errors %}invalid{% endif %}" rows="3"
                 placeholder="Describe the property — features, neighbourhood, access…">{{ form.description.value|default:'' }}</textarea>
+              {% for e in form.description.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
             <div class="col-12">
               <label class="field-label">Property Photo <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
@@ -78,22 +79,25 @@
             </div>
             <div class="col-sm-6 col-md-3">
               <label class="field-label">Parking</label>
-              <input type="number" name="parking" class="field-input"
+              <input type="number" name="parking" class="field-input {% if form.parking.errors %}invalid{% endif %}"
                 placeholder="1" min="0" value="{{ form.parking.value|default:'' }}" required>
+              {% for e in form.parking.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
             <div class="col-sm-6 col-md-3">
               <label class="field-label">Listed Price (₦)</label>
-              <input type="number" name="listed_price" class="field-input"
+              <input type="number" name="listed_price" class="field-input {% if form.listed_price.errors %}invalid{% endif %}"
                 placeholder="85000000" min="0" value="{{ form.listed_price.value|default:'' }}">
+              {% for e in form.listed_price.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
             <div class="col-sm-6 col-md-6">
               <label class="field-label">Furnishing Status</label>
-              <select name="furnishingstatus" class="field-input field-select" required>
+              <select name="furnishingstatus" class="field-input field-select {% if form.furnishingstatus.errors %}invalid{% endif %}" required>
                 <option value="">Select…</option>
                 <option value="furnished" {% if form.furnishingstatus.value == 'furnished' %}selected{% endif %}>Furnished</option>
                 <option value="semi-furnished" {% if form.furnishingstatus.value == 'semi-furnished' %}selected{% endif %}>Semi-Furnished</option>
                 <option value="unfurnished" {% if form.furnishingstatus.value == 'unfurnished' %}selected{% endif %}>Unfurnished</option>
               </select>
+              {% for e in form.furnishingstatus.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
           </div>
         </div>

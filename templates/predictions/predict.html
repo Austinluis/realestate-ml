@@ -41,22 +41,27 @@
           <div class="col-sm-6">
             <label class="field-label">Area (sqft)</label>
             <input type="number" id="f_area" class="field-input" placeholder="2500" min="1">
+            <div class="field-error" id="err_f_area"></div>
           </div>
           <div class="col-sm-6">
             <label class="field-label">Bedrooms</label>
             <input type="number" id="f_bedrooms" class="field-input" placeholder="3" min="1">
+            <div class="field-error" id="err_f_bedrooms"></div>
           </div>
           <div class="col-sm-6">
             <label class="field-label">Bathrooms</label>
             <input type="number" id="f_bathrooms" class="field-input" placeholder="2" min="1">
+            <div class="field-error" id="err_f_bathrooms"></div>
           </div>
           <div class="col-sm-6">
             <label class="field-label">Stories</label>
             <input type="number" id="f_stories" class="field-input" placeholder="2" min="1">
+            <div class="field-error" id="err_f_stories"></div>
           </div>
           <div class="col-sm-6">
             <label class="field-label">Parking Spaces</label>
             <input type="number" id="f_parking" class="field-input" placeholder="1" min="0">
+            <div class="field-error" id="err_f_parking"></div>
           </div>
           <div class="col-sm-6">
             <label class="field-label">Furnishing Status</label>
@@ -145,6 +150,37 @@ function showPredictionError(message) {
     alert(message);
   }
 }
+function clearPredictionFieldErrors() {
+  ['f_area', 'f_bedrooms', 'f_bathrooms', 'f_stories', 'f_parking'].forEach((id) => {
+    const input = document.getElementById(id);
+    const err = document.getElementById('err_' + id);
+    if (input) input.classList.remove('invalid');
+    if (err) err.textContent = '';
+  });
+}
+function validatePredictionFields() {
+  clearPredictionFieldErrors();
+  const rules = [
+    ['f_area', 'Area is required and must be greater than 0.', 1],
+    ['f_bedrooms', 'Bedrooms is required and must be greater than 0.', 1],
+    ['f_bathrooms', 'Bathrooms is required and must be greater than 0.', 1],
+    ['f_stories', 'Stories is required and must be greater than 0.', 1],
+    ['f_parking', 'Parking spaces is required and cannot be negative.', 0],
+  ];
+  const errors = [];
+  rules.forEach(([id, message, min]) => {
+    const input = document.getElementById(id);
+    const value = input ? input.value.trim() : '';
+    const numberValue = Number(value);
+    if (value === '' || !Number.isInteger(numberValue) || numberValue < min) {
+      if (input) input.classList.add('invalid');
+      const err = document.getElementById('err_' + id);
+      if (err) err.textContent = message;
+      errors.push(message);
+    }
+  });
+  return errors;
+}
 
 async function runPrediction() {
   const btn = document.getElementById('predict-btn');
@@ -157,6 +193,14 @@ async function runPrediction() {
   btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:14px;height:14px;border-width:2px;"></span> Predicting…';
   setDisplay(resultOutput, 'none');
   setDisplay(resultError, 'none');
+
+  const fieldErrors = validatePredictionFields();
+  if (fieldErrors.length) {
+    showPredictionError('Please fix the highlighted fields before predicting.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-graph-up-arrow"></i> Predict Price';
+    return;
+  }
 
   const payload = {
     area: document.getElementById('f_area').value,

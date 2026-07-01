@@ -12,22 +12,25 @@
       <form method="post" novalidate>
         {% csrf_token %}
         <div class="mb-3">
-          <label class="field-label">Email</label>
+          <label class="field-label">{{ form.identifier.label }}</label>
           <div style="position:relative;">
-            <i class="bi bi-envelope" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(26,35,50,0.35);font-size:14px;"></i>
-            <input type="email" name="email" class="field-input" style="padding-left:36px;" placeholder="you@example.com" required autofocus>
+            <i class="bi bi-person" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(26,35,50,0.35);font-size:14px;"></i>
+            <input type="text" name="identifier" class="field-input {% if form.identifier.errors %}invalid{% endif %}" style="padding-left:36px;" placeholder="username or you@example.com" value="{{ form.identifier.value|default:'' }}" required autofocus>
           </div>
+          {% for error in form.identifier.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
         <div class="mb-4">
           <label class="field-label">Password</label>
           <div style="position:relative;">
             <i class="bi bi-lock" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(26,35,50,0.35);font-size:14px;"></i>
-            <input type="password" name="password" class="field-input" style="padding-left:36px;" placeholder="••••••••" required>
+            <input type="password" name="password" class="field-input {% if form.password.errors %}invalid{% endif %}" style="padding-left:36px;" placeholder="••••••••" required>
           </div>
+          {% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
         </div>
         <button type="submit" class="btn-primary btn-lg w-100" style="justify-content:center;">Log in</button>
       </form>
     </div>
+    <div class="auth-footer"><a href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> Back to home</a></div>
     <div class="auth-footer">Don't have an account? <a href="{% url 'register' %}">Create one</a></div>
   </div>
 </div>

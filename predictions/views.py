@@ -12,6 +12,13 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ml'))
 
 INTEGER_FIELDS = ['area', 'bedrooms', 'bathrooms', 'stories', 'parking']
+INTEGER_FIELD_LABELS = {
+    'area': 'Area',
+    'bedrooms': 'Bedrooms',
+    'bathrooms': 'Bathrooms',
+    'stories': 'Stories',
+    'parking': 'Parking spaces',
+}
 CHOICE_DEFAULTS = {
     'mainroad': 'no',
     'guestroom': 'no',
@@ -26,9 +33,19 @@ def parse_prediction_features(data):
     features = {}
     for field in INTEGER_FIELDS:
         value = data.get(field)
+        label = INTEGER_FIELD_LABELS[field]
         if value in (None, ''):
-            raise ValueError(f'{field} is required.')
-        features[field] = int(value)
+            raise ValueError(f'{label} is required.')
+        try:
+            parsed_value = int(value)
+        except (TypeError, ValueError):
+            raise ValueError(f'{label} must be a whole number.')
+        minimum = 0 if field == 'parking' else 1
+        if parsed_value < minimum:
+            if minimum == 0:
+                raise ValueError(f'{label} cannot be negative.')
+            raise ValueError(f'{label} must be greater than 0.')
+        features[field] = parsed_value
 
     for field, default in CHOICE_DEFAULTS.items():
         features[field] = data.get(field) or default

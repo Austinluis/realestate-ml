@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}EstateIQ — AI Real Estate Intelligence{% endblock %}
+{% block body_class %}landing-page{% endblock %}
+
+{% block content %}
+<header class="landing-nav">
+  <a href="{% url 'home' %}" class="landing-brand">
+    <span class="landing-brand-icon"><i class="bi bi-house-fill"></i></span>
+    <span>EstateIQ</span>
+  </a>
+  <nav class="landing-links">
+    <a href="#features">Features</a>
+    <a href="#listings">Listings</a>
+    <a href="#process">How it works</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <div class="landing-actions">
+    <a href="{% url 'login' %}" class="landing-signin">Sign in</a>
+    <a href="{% url 'register' %}" class="btn-primary">Sign up</a>
+  </div>
+</header>
+
+<section class="landing-hero">
+  <div class="landing-hero-copy">
+    <span class="landing-eyebrow">AI-powered real estate</span>
+    <h1>Discover Your Dream <em>Home</em> with AI Intelligence</h1>
+    <p>Estimate property values, organize listings, and make smarter real estate decisions with machine-learning insights built for modern investors and homeowners.</p>
+    <div class="landing-hero-actions">
+      <a href="{% url 'register' %}" class="btn-primary btn-lg">Explore Properties <i class="bi bi-arrow-right"></i></a>
+      <a href="{% url 'login' %}" class="btn-outline btn-lg"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
+    </div>
+    <div class="landing-avatars" aria-label="Trusted users">
+      <span></span><span></span><span></span><span></span>
+      <small>Trusted by active property managers</small>
+    </div>
+  </div>
+  <div class="landing-hero-card">
+    <img src="{% static 'images/landing/hero-home.jpeg' %}" alt="Modern luxury home exterior">
+    <div class="hero-property-panel">
+      <div>
+        <strong>Villa Serenity</strong>
+        <span>Lagos, Nigeria</span>
+      </div>
+      <div class="hero-price">₦91.2M</div>
+    </div>
+  </div>
+</section>
+
+<section class="landing-stats" aria-label="EstateIQ stats">
+  <div><strong>2,458+</strong><span>Properties analyzed</span></div>
+  <div><strong>96%</strong><span>Prediction confidence</span></div>
+  <div><strong>150+</strong><span>Active listings</span></div>
+  <div><strong>₦1.2B</strong><span>Portfolio value tracked</span></div>
+</section>
+
+<section id="features" class="landing-section">
+  <div class="landing-section-head">
+    <span class="landing-eyebrow">Features</span>
+    <h2>AI-Powered Property Intelligence</h2>
+    <p>Tools for clearer decisions before you buy, sell, list, or invest.</p>
+  </div>
+  <div class="feature-grid">
+    <article>
+      <i class="bi bi-graph-up-arrow"></i>
+      <h3>Live Market Scanning</h3>
+      <p>Track price signals and compare property opportunities from one workspace.</p>
+    </article>
+    <article>
+      <i class="bi bi-cpu"></i>
+      <h3>Expert AI Insights</h3>
+      <p>Use property features to estimate value with a trained prediction model.</p>
+    </article>
+    <article>
+      <i class="bi bi-stars"></i>
+      <h3>Best Area Suggestions</h3>
+      <p>Evaluate locations, amenities, and property characteristics faster.</p>
+    </article>
+  </div>
+</section>
+
+<section id="listings" class="landing-section landing-listings">
+  <div class="landing-listing-title">
+    <div>
+      <span class="landing-eyebrow">Explore</span>
+      <h2>Curated Listings</h2>
+    </div>
+    <a href="{% url 'register' %}">View all properties <i class="bi bi-arrow-right"></i></a>
+  </div>
+  <div class="listing-mosaic">
+    <article class="listing-tile tile-wide">
+      <img src="{% static 'images/landing/glass-pavilion.jpeg' %}" alt="Glass pavilion property">
+      <div><span>Featured</span><strong>The Glass Pavilion</strong><small>₦250M</small></div>
+    </article>
+    <article class="listing-tile">
+      <img src="{% static 'images/landing/skyline-penthouse.jpeg' %}" alt="Skyline penthouse">
+      <div><strong>Skyline Penthouse</strong><small>₦180M</small></div>
+    </article>
+    <article class="listing-tile">
+      <img src="{% static 'images/landing/desert-oasis.jpeg' %}" alt="Private villa">
+      <div><strong>Desert Oasis</strong><small>₦92M</small></div>
+    </article>
+    <article class="listing-tile tile-large">
+      <img src="{% static 'images/landing/coastal-retreat.jpeg' %}" alt="Coastal retreat">
+      <div><strong>Coastal Retreat</strong><small>₦340M</small></div>
+    </article>
+  </div>
+</section>
+
+<section id="process" class="landing-band">
+  <div class="landing-band-copy">
+    <span class="landing-eyebrow">Your journey</span>
+    <h2>The Path to Your <em>New Beginning</em></h2>
+    <p>EstateIQ gives every user a practical flow from property entry to AI-backed valuation and portfolio review.</p>
+    <a href="{% url 'register' %}" class="btn-primary">Get started</a>
+  </div>
+  <div class="process-list">
+    <div><span>01</span><strong>Portfolio Analysis</strong><p>Add your properties and keep their important details organized.</p></div>
+    <div><span>02</span><strong>Smart Valuation</strong><p>Run predictions from area, rooms, parking, furnishing, and key amenities.</p></div>
+    <div><span>03</span><strong>Instant Result History</strong><p>Review previous valuation records whenever you need comparison context.</p></div>
+    <div><span>04</span><strong>Seamless Closure</strong><p>Move from estimate to action with cleaner property intelligence.</p></div>
+  </div>
+</section>
+
+<section class="landing-section redefine-section">
+  <div class="redefine-image">
+    <img src="{% static 'images/landing/boardroom.jpeg' %}" alt="Real estate strategy meeting">
+  </div>
+  <div class="redefine-copy">
+    <span class="landing-eyebrow">Why EstateIQ</span>
+    <h2>Redefining Real Estate</h2>
+    <div class="value-row"><i class="bi bi-shield-check"></i><div><strong>Verified property data</strong><p>Structured forms keep important listing details consistent.</p></div></div>
+    <div class="value-row"><i class="bi bi-lightning-charge"></i><div><strong>Fast decision support</strong><p>Instant predictions reduce manual valuation guesswork.</p></div></div>
+    <div class="value-row"><i class="bi bi-kanban"></i><div><strong>Portfolio visibility</strong><p>Your dashboard keeps properties and predictions in one place.</p></div></div>
+  </div>
+</section>
+
+<section class="landing-section testimonials">
+  <div class="landing-section-head">
+    <span class="landing-eyebrow">Testimonials</span>
+    <h2>What Our Clients Say</h2>
+  </div>
+  <div class="testimonial-grid">
+    <article><div>★★★★★</div><p>EstateIQ made our pricing discussions clearer and faster.</p><strong>Amara N.</strong></article>
+    <article><div>★★★★★</div><p>The dashboard is simple enough for daily portfolio work.</p><strong>Tunde A.</strong></article>
+    <article><div>★★★★★</div><p>AI valuation helped us compare options before listing.</p><strong>Chioma E.</strong></article>
+  </div>
+</section>
+
+<section id="contact" class="landing-cta">
+  <h2>Ready to Find Your Dream Home?</h2>
+  <p>Start managing properties and predicting values with EstateIQ.</p>
+  <div>
+    <a href="{% url 'register' %}" class="btn-primary btn-lg">Get Started</a>
+    <a href="{% url 'login' %}" class="btn-outline btn-lg">Sign In</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="landing-footer">
+  <div>
+    <a href="{% url 'home' %}" class="landing-brand"><span class="landing-brand-icon"><i class="bi bi-house-fill"></i></span><span>EstateIQ</span></a>
+    <p>ML-driven real estate management for smarter property decisions.</p>
+  </div>
+  <div><strong>Main links</strong><a href="#features">Features</a><a href="#listings">Listings</a><a href="#process">How it works</a></div>
+  <div><strong>Account</strong><a href="{% url 'login' %}">Sign in</a><a href="{% url 'register' %}">Create account</a></div>
+  <div><strong>Project</strong><span>GROUP 15</span><span>CSC 476</span><span>University of Ibadan</span></div>
+</footer>
+{% endblock %}
